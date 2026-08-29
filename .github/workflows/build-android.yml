@@ -21,13 +21,14 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install Dependencies & Build Web
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build Web Assets & Sync Capacitor
         run: |
-          cd ice-island
-          npm install --legacy-peer-deps
           npm run build --if-present
-          if [ -f "capacitor.config.ts" ] || [ -f "capacitor.config.json" ] || [ -f "capacitor.config.js" ]; then
-            npx cap sync android
+          if [ -d "android" ]; then
+            npx cap sync android || true
           fi
 
       - name: Set up Java JDK
