@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0b1230">
+<meta name="description" content="جزيرة الجليد — لعبة فيزيائية لفرز الكرات بالعربية">
+<link rel="manifest" href="manifest.json">
+<title>جزيرة الجليد — Ice Island</title>
+<link rel="stylesheet" href="css/style.css">
+<!-- محرك الفيزياء: يحاول التحميل من نسخة محلية أولًا (يلزم توفيرها — راجع
+     www/assets/libs/README.md)، وإن لم تتوفر يسقط تلقائيًا على CDN كحل احتياطي
+     مؤقت أثناء التطوير فقط. للنشر النهائي: وفّر النسخة المحلية لضمان عمل اللعبة
+     بلا إنترنت. -->
+<script src="assets/libs/matter.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js';document.head.appendChild(s);"></script>
+</head>
+<body>
+<div id="game-container">
+<div class="aurora"></div>
+<img id="iron-texture-img" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIbGNtcwIQAABtbnRyUkdCIFhZWiAH4gADABQACQAOAB1hY3NwTVNGVAAAAABzYXdzY3RybAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWhhbmSdkQA9QICwPUB0LIGepSKOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAABxjcHJ0AAABDAAAAAx3dHB0AAABGAAAABRyWFlaAAABLAAAABRnWFlaAAABQAAAABRiWFlaAAABVAAAABRyVFJDAAABaAAAAGBnVFJDAAABaAAAAGBiVFJDAAABaAAAAGBkZXNjAAAAAAAAAAV1UkdCAAAAAAAAAAAAAAAAdGV4dAAAAABDQzAAWFlaIAAAAAAAAPNUAAEAAAABFslYWVogAAAAAAAAb6AAADjyAAADj1hZWiAAAAAAAABilgAAt4kAABjaWFlaIAAAAAAAACSgAAAPhQAAtsRjdXJ2AAAAAAAAACoAAAB8APgBnAJ1A4MEyQZOCBIKGAxiDvQRzxT2GGocLiBDJKwpai5+M+s5sz/WRldNNlR2XBdkHWyGdVZ+jYgskjacq6eMstu+mcrH12Xkd/H5////2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCALQAtADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD0CiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKSgBaKSo3nSMfMwH40ASUVlz63bxcD5voRWfL4l5wkJ/FqAOkzTTIq9SK4248Rz9lA+jGs2XW5pD3H/AAI0DsehGeMfxD86T7TF/fX8xXmhvpm5Zj+ZqN7xj/8ArpBY9O+1w/31/wC+hSfa4f76/wDfQry83bd1pv2kntQFj1P7XD/fX/voUfaov76/mK8r+0tzxSC7dT/9emI9W+0Rn+IfnTvOT+8PzrypdQlXox/M1PFq9wn8RP8AwI0AeoB1boRS159b+Ip4+q5/4Ea0YPFWOHiP4NQB2FLWDb+IoZOox9WFaUOoRS9CPzFAFyimLIrdCKdQAtFJRQAtFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABSUtJQAUVHNOkK5dgPxrA1HxPHB8sMe88/xUAdC8qxjLED8aybvxBb2/AG4+zCuQutUuL0/OxQem41SkmRcAZPvSHY6O58RTznbHGEHruNZF1eyNgtIW/wCBVmvdMTgDFRZ3d6B2LT3JzkH9aia5Yjj+dQ9CaYcg8UDJd59aazGmcikJJoAdvpM/jRjtRjFACZJ70bvWkbimYLUCH5yaTNAbHBpjdaBC5pelNApxOB0pgPDkU5ZDUXNKDmgCylww681YgvpIzwT+ZrPU+lSbiR0oA6G11+WI4I3D/eNbtp4hV/vLj/gVcGrFakhuCpP+NAHqFvfxzDgj8xVsMD0NeZW9/JGcqT+dbdn4gaMgSL6c7qBHZUtZ1pqkc47fnV9WDDINADqKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiikoAWkoqhqOqRWSjd8zHPAIoAuySLGuWIA+tYWo+I44PliTeeed3Fc7qetSXLfMSo54DGsqSRpRljtApDsXr3VZrpjknv3NZ5kAPNRPL2UYqMtmgY+SYtURekCnOKUgKcDmgBc0DJzimk4PApRk9KBjsD8aTce1AUk07Z3BpDGE5HFGMjNOQc054dvGetAhgYDimlqftAOKaYyOc0AMYHg5p/G2hsKBjrQA3U0wGMu6gDmpAMmmnBPSgVhvA4pwUkYzSdaTBoAQAj3oOe1KDtOKXeOmOaAGfpSiQ0pXcKYUI70AShqUnIqJTS5OaYiZXK8jmpVnYZ7iqqvzTlfNAGnbXxT7pII9637DxAUO2RfTndXIAg+1SK5AwelAHp9rqMc47fnV4EHpXl9rfS25ypyPqa6jS9eEnDD06tQI6miooZ1mXK/zqSgBaKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiikoAKRmCjJ4pk8yQIXkIAHqa47WvEJucRwqVUZ53daANPV/EIiPlW65POW3dPyrj7y8ZmySWJ9TUM9zn6/Wq27uetIY/dzluaYz76jZyaQEY460DFz60vmDFMPPA/GldQmMc0ABcn2p5XmomxxUqZYE9hQAAbacGx0po5o27T1oGPU7TzSv6rTTzyaDwMmkAoOeehpQ+DzSAYwcZBqQqOhoAiJ3DKjkUBcck5p7wMmDu4p4jDdTQBCOvSn4wKUFSSFOaTvzTAZ07Umeafk9qTbu6nFAEJBDYAzSkHFSZJ6CmnikBGRmkWn4703kc0wFBKfQ0pUBc5zmow5Oc0pOBxQITpSqR0NAbjGKRkxg0AKRg0o5ppOcZoGRTAkBp4fvUINLmkBaV8jNSJLg5U4qmrbalUhuRxTEdNpOttEdrj053V19pepcLxgfjXl6tg1p6fqj2r4OSDjvQB6RS1k6dqqXC8+3etUEEZFAhaKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAopKKACobq5jtYTJKwAAPU4zRd3UdpCZJCAACeuK8/1fWJdUlDMuyNc7VyaAJNX1mTUHGRsQZwA1Y08wTgck1HNLjgVWzk0hjwduSeSaaW3UxjQCcUwHbvQUqnaCMdaRFzntSclsCgCTIYfLx60nRcmkjUmTC81bUZXAABpAVYkLc1adFVMg80/asTDnJNRTDGdp60ARKpJ4o24JGc0gyB1qdQrDk4oGRKxP0FPJ545zQSkfy9SaRiCAAKBEu/YMYyKcJQVyR0qEZxinqNvBoGSJG7jcfyqMgkEdKkLyFP3S9Op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ANxg0vvQeaTpQAhX3pvtT93akwQKAIypPSkI4pwOOtKfWkMYRTTUhODQ6cZFAEOM80h5p555FJjimBHQRTjwaQ0ANpSMiikoASlx70lFAxelIaTJopCCkNH1o60wFopBRQAuM0goooAXNJS0HigBOlJS0ZoATFGKWigAp2aSigBxOKM5ppp2cCgApQOeKSpF60ANbk0qp3pcYbrRvxxQAhAPFA4o20pGKAJFGRmkFJu2jpTgMjNAgpRzSilxk0AGKmtoDPMEX15qMCup8P6WRknlmx26UAbehWAx6Bcdq6gDAxVeztxBHgVZoAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACkpaKAKGradHqNqY34ODg4zjivLL21e0naKQHIJHTHevYa5vxVon26FZouJIwT93qME0Aec0meKeylSQRyKZigBKUc0g5FNwQaAFJ3ZBpF44NOIzQVyKAGEGgZ7UvOaUDaTQAwgdutMAzTgQWz0xRt54NIZGVpCKkx2pODTAiNJTytNxQA2ilNIaAEz2pKDRQAUUUUAGaKKKACiigUAGaKKKACjFFGaACloooAKKKKADNKKMUDpQA4cHpmnHk0sYwMmkC5bigAx3oA5zT+gpDxQAg60q8Zpehpc46UAKBxTgMUJnvTsUCGjmnKcmgLV3T7I3Mu0cAYycUAWtG0/7RIZHBwpGBjrXoel2IhTcepx2qlo2mhVyeAMY4roAMDAoAKWkpaACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKRhkYNLSUAcP4s0DyyLq3HBzuUL9T2rjiMV7PIgkUhhxXAeJ/Dxs2Fxb5ZGJ3KF6dT2oA5WjGacRSGgBvOKAc0ZpCPSgBHGaRTjOaeKQ0AMODTdpBxmnEEHik60DEOBScdqD1o70AJ1prCpGA7UzvQAwimkVKRmmYoGMpMU/GaaRQITFFFFAwoooxQAGkpaKBAaKKKACiiigApQcUlLQApo6UvWjbQAAU9celN6U4ZNADmI7U1Sc5pRjGBSlcUAGd1A5NGM0DINADttKq0Eljx0p6LtoEKBmnAZpyrxU0ELTSBFHP0oAS3t2mkCr/LpXbaFpagYHQYzx1qHRdFCqQD6ZO2uutbdYEwP5UASRxiNcCn0lFAC0UUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAJTJY1lQqwBBqSkoA8+8SeG2tG+0WxLIcll29Op7Vy5FezugdcMK4zxH4X5+0Whwedy7fqewoA4kikqV0IYqwII7GmFaAGUjeop5FNIIoAbupGHcUoooAZk4yKRjgZpx9qTtQAgNJkHijvTWHNAxO+KCcmig0ANPFITRRQMTFFFFACZpc0lFAgzRmiigAooooABRRSigApRSYoxigB2cGngZ5pgFOFAC4xS4pRzS5A5oARRil2+9PT1NL0oAbj0pQnrTlqUKDQIjVPSpQuBTlGfYVYtLR7x9qcKOpxQAy3haZwqDJ+nSuu0PRwuR9MnbU+j6IqLxwOOdvWunggWFcL/KgAggWFcCpaWigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigApGAYYNLRQBzeveGor8CSJhHIueQo5rgru0ltJTHMpU9jgjP517BWfqekwX8e2QDvg7QcUAeTkUw8Vu6r4euNPbKEyoc9FPFYrD2wfSgCIrSdKk24puKAI2GKZipSMUhGaAIzSZxTytMIoGNPtSE4p2MGkxmgBh6UnankU0igBpoAz1oxRigBMUYpcUUAJiilxRigAPJpMUuKMUAApQKKUcUAGM+1KBS0pXAoAQU4Ke9KORTwpNACAcYpyrntSquKlAzQIYFIPrShNzZJp44p4UDmgBAoFBNPRWmbbGpP0Fb+l6Ed26Q724/h6UAZ+n6XJeHc+UUY4x1rttL0dY1yQAOONtXLDTFhGW5PHatMADpQA1ECDAFOpaKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooASloooAjkiWQYYfpXPav4YhvBuVtjDPKqK6WkoA8o1LRrmwb5gXXnkKazceleyTW6TDDAflXN6n4SguTujbyzz91R/hQB58RTStbN94fu7M8fvF56KayWUqcMCp96AISKXGaeRmmkUAMK0zFS59qQ0ARbaZip8UmKAINtG2pitJtoGQ4NGKmIoxQBCFpdpqTGaTFADMUEY7VLtoxigCMCl2Zp457UuKBCYoxmnD6U8LigBqrinkCjGKX6UAKBT80+3sp5z8qH6kGti08NvIcyOfoFoGYigtwilj7Vq2Why3BBlYqOOADXW6f4fSIcYHT+H/61bcFhHD7/hQIxdO0JUXjCjj+Gt63tUgHH8qnAwOKKACilooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigApKWigCN4lccgflWXe6Fb3I5Vf++R/hWxRQBw174NA+aGUj221g3Wg3dv0G/6Kf8K9Wxmo3hR+oH5UAeNyQvGf3kbD6io+K9dm0qCXqq/iorLuvC1tKc4A+iD/AAoA812ikK121x4MT+CVh/wH/wCtWfL4SlT7sx/75NAHMYNGM1tyeHblDw2f+AmoG0O8H8JP/AT/AIUAZZ4o21onR7wf8smP/AT/AIU3+yLz/nk//fB/woAobaMVoDR7w/8ALJv++T/hTxod438JH/AT/hQBl4pRzWxH4cuT1bH/AAE1Zj8LSN1lP/fJoA5/ikHvXXQ+Eh/E7H/gP/1q1LfwrEnOB+KD/CgDgY0Z+FQn8KtwaVcz/wAO36qa9Gg0KNPQf8BFXo9OiT/9QoA8/tvDDv8AfkJ+i1vWPhqNB0H4r/8AWrq1hRegH5U/GKAMu30eOPqR+VX47dI+gH5VLRQAUtFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABSUtFACUUtFACUhRT1Ap1FAERgQ9h+VJ9nj9P0qaigCH7NH6fpR9mj9P0qaigCH7NH6fpR9mj9B+VTUUAQ/Z4/QflThEg6AflUlFACBQOwopaKACkpaKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP/2Q==" style="display:none" crossorigin="anonymous">
+
+
+<audio id="audio-slide" preload="auto" src="assets/sounds/slide.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2022/03/24/audio_123a6a3d0a.mp3?filename=page-flip-01a-101932.mp3';"></audio>
+<audio id="audio-paper" preload="auto" src="assets/sounds/paper.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a650f6.mp3?filename=cartoon-jump-6462.mp3';"></audio>
+
+<audio id="audio-pour" preload="auto" src="assets/sounds/pour.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2022/03/10/audio_ca9951e27e.mp3?filename=freesound_community-swim-44183.mp3';"></audio>
+<audio id="audio-hit" preload="auto" src="assets/sounds/hit.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2025/12/19/audio_dad43c820a.mp3?filename=dragon-studio-shattering-ice-454251.mp3';"></audio>
+<audio id="audio-split" preload="auto" src="assets/sounds/split.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2026/03/30/audio_f5fc23a5ad.mp3?filename=dragon-studio-glass-cracking-511310.mp3';"></audio>
+<audio id="audio-melt" preload="auto" src="assets/sounds/melt.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2022/03/15/audio_4ab58c27d5.mp3?filename=tronified2_128-90797.mp3';"></audio>
+<audio id="audio-win" preload="auto" src="assets/sounds/win.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2025/01/26/audio_f562bfcb32.mp3';"></audio>
+<audio id="audio-coin" preload="auto" src="assets/sounds/coin.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2022/01/18/audio_7cc04957e7.mp3?filename=burstfirewav-14443.mp3';"></audio>
+<audio id="audio-iron" preload="auto" src="assets/sounds/iron.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2021/08/09/audio_9788fd890e.mp3';"></audio>
+
+<audio id="audio-bg-type1" preload="auto" loop src="assets/sounds/bg-type1.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2022/03/14/audio_0c050ecc4b.mp3?filename=rome-legion-62972.mp3';"></audio>
+<audio id="audio-bg-type2" preload="auto" loop src="assets/sounds/bg-type2.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2021/11/25/audio_0a4a2d5e9c.mp3?filename=acoustic-breeze-102993.mp3';"></audio>
+<audio id="audio-bg-type3" preload="auto" loop src="assets/sounds/bg-type3.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2022/10/30/audio_8a0c64d7f3.mp3?filename=cinematic-atmosphere-score-2-112199.mp3';"></audio>
+
+
+<!-- أصوات جديدة محسنة من ألعاب مشابهة - بحث وكلاء فرعيين - قانونية 100% -->
+<audio id="audio-predict-new" preload="auto" src="assets/sounds/predict.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2025/04/29/audio_cc27d4eb0e.mp3?filename=freesounds123-magic-spell-333896.mp3';"></audio>
+<audio id="audio-activate-new" preload="auto" src="assets/sounds/activate.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2022/03/10/audio_d6d84780e8.mp3?filename=sci-fi-energy-gun-39409.mp3';"></audio>
+<audio id="audio-pour-new" preload="auto" src="assets/sounds/pour.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2022/03/10/audio_ca9951e27e.mp3?filename=freesound_community-swim-44183.mp3';"></audio>
+<audio id="audio-iron-break-new" preload="auto" src="assets/sounds/iron-break.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2024/08/07/audio_604fb2e7d9.mp3?filename=metal-beaten-sfx-230501.mp3';"></audio>
+<audio id="audio-purchase-success-new" preload="auto" src="assets/sounds/slide.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2022/03/24/audio_123a6a3d0a.mp3?filename=page-flip-01a-101932.mp3';"></audio>
+<audio id="audio-cozy-cafe-new" preload="auto" loop src="assets/sounds/cozy-cafe.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2022/10/03/audio_8b7c7c0d2b.mp3?filename=gentle-piano-ambient-114998.mp3';"></audio>
+
+<audio id="audio-dropdown-click" preload="auto" src="assets/sounds/dropdown-click.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2022/10/30/audio_4fa75b6720.mp3?filename=interface-124464.mp3';"></audio>
+
+<audio id="audio-purchase-train" preload="auto" src="assets/sounds/purchase-train.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=happy-day-101997.mp3';"></audio>
+
+<audio id="audio-bg" preload="auto" loop src="assets/sounds/bg-type1.mp3" onerror="this.onerror=null;this.src='https://cdn.pixabay.com/download/audio/2022/03/14/audio_0c050ecc4b.mp3?filename=rome-legion-62972.mp3';"></audio>
+
+<div id="ui-top">
+  <div>🪙 <span id="coins">1500</span> | ⭐ <span id="stars">0</span> | 🎯 Lv <span id="level">1</span></div>
+  <div>🎱 <span id="total-count">0</span> | 📦 <span id="bag-total">140</span> | 🔮 <span id="predict-status">لم تتوقع</span></div>
+</div>
+<div id="vessel-bar"><div id="vessel-fill"></div><div id="vessel-label">100% - جاهز</div></div>
+<div id="pour-position">📍 <span id="pour-pos-text">وسط</span></div>
+<div id="heavy-indicator">🧊 x<span id="heavy-count">10</span></div>
+<div id="fire-indicator">🔥 x<span id="fire-count">10</span></div>
+<div id="iron-indicator">⚙️ x<span id="iron-count">10</span></div>
+<div id="stats">
+  <div>🏆 الفوز: أول وعاء ممتلئ</div>
+  <div>📊 في الأوعية: <span id="in-cups">0.0</span> | نشط: <span id="active-count">0</span></div>
+  <div>🔢 <span id="match-check">YES ✓ 0.0/0</span></div>
+  <div style="margin-top:3px;border-top:1px solid #333;padding-top:3px;font-size:6px">
+    وسط C: 40 كرة → 70⭐<br>
+    B,D: 50 كرة → 65⭐<br>
+    A,E: 60 كرة → 60⭐
+  </div>
+</div>
+
+</div>
+<div id="pour-indicator"><div class="arrow"></div><div class="line"></div></div>
+<div id="canvas-wrapper"></div>
+<div id="buckets-ui"></div>
+
+
+
+<div id="controls">
+  <div class="controls-row" id="controls-main-row">
+    <button id="right-btn">▶</button>
+    <button id="pour-btn">💧 سكب</button>
+    <button id="left-btn">◀</button>
+    <button class="btn-ctrl" id="gun-btn" style="background:linear-gradient(180deg,#9b59b6,#8e44ad);display:none; min-width:48px; min-height:48px; width:48px; height:48px">🔫 x<span id="gun-count">0</span></button>
+  </div>
+  <div class="controls-row" id="controls-secondary-row">
+    <button id="options-toggle">☰ الخيارات ▼</button>
+    <button class="btn-ctrl" id="predict-btn">🔮 توقع</button>
+    <button id="balls-toggle">🎱 الكرات ▼</button>
+  </div>
+  <div id="balls-dropdown">
+    <div id="inventory-icons">
+      <div style="font-size:9px;text-align:center;color:#ffd700;font-weight:bold;margin-bottom:6px">🎒 مخزني</div>
+      <div class="inv-item" id="inv-normal">🟣 <span class="inv-count" id="inv-c-normal">100</span></div>
+      <div class="inv-item clickable" id="inv-ice">🧊 <span class="inv-count" id="inv-c-ice">20</span></div>
+      <div class="inv-item clickable" id="inv-fire">🔥 <span class="inv-count" id="inv-c-fire">20</span></div>
+      <div class="inv-item clickable" id="inv-iron">⚙️ <span class="inv-count" id="inv-c-iron">0</span></div>
+      <div class="inv-item" id="inv-guns">🔫 <span class="inv-count" id="inv-c-guns">0</span></div>
+      <div class="inv-item" id="inv-cards">🃏 <span class="inv-count" id="inv-c-cards">5</span></div>
+    </div>
+  </div>
+  <div id="options-dropdown">
+    <button class="btn-ctrl" id="home-btn" style="background:linear-gradient(180deg,#2c3e50,#1a252f);border-color:#7dd8ff">🏠 الرئيسية</button>
+    <button class="btn-ctrl" id="redo-btn">🔄 إعادة</button>
+    <button class="btn-ctrl" id="board-btn">🎲 لوحة</button>
+    <button class="btn-ctrl" id="shop-btn">🛒 متجر</button>
+    <button class="btn-ctrl" id="stats-btn" style="background:linear-gradient(180deg,#34495e,#2c3e50)">📊 إحصائيات</button>
+    <button class="btn-ctrl" id="sound-toggle">🔊 صوت</button>
+    <button class="btn-ctrl" id="music-toggle">🎵 موسيقى</button>
+  </div>
+
+  
+  <div id="music-types-dropdown">
+    <div style="font-size:9px;color:#7dd8ff;text-align:center;padding:4px 0 6px 0;border-bottom:1px solid rgba(125,216,255,0.2);margin-bottom:6px">🎵 موسيقى أصلية 100% - بدون حقوق</div>
+    <button class="btn-ctrl music-type-btn" data-type="1">❄️ قرية جليدية - Catan/Carcassonne</button>
+    <button class="btn-ctrl music-type-btn" data-type="2">☕ مقهى دافئ - Azul/Coffee Talk - Bossa Nova</button>
+    <button class="btn-ctrl music-type-btn" data-type="3">🎻 ملحمي سينمائي - Gloomhaven - Cinematic Orchestral</button>
+    <button class="btn-ctrl" id="music-mute-btn" style="background:linear-gradient(180deg,#7f8c8d,#636e72)">🔇 كتم الموسيقى فقط</button>
+  </div>
+  </div>
+  </div>
+
+</div>
+
+
+
+</div>
+
+<div id="shop-modal">
+  <div class="shop-header">
+    <div>🛒 متجر v5.7 Ultimate - ^ أقرب - كامل</div>
+    <div>🪙 <span id="shop-coins">1500</span> | ⭐ <span id="shop-stars">0</span></div>
+    <button id="close-shop" style="background:#e74c3c;border:none;padding:4px 9px;border-radius:6px;color:white;cursor:pointer">X</button>
+  </div>
+  <div class="shop-tab">
+    <button class="tab-btn active" data-tab="balls">🎱 كرات</button>
+    <button class="tab-btn" data-tab="cards">🃏 بطاقات</button>
+    <button class="tab-btn" data-tab="coins">🪙 كوين</button>
+    <button class="tab-btn" data-tab="guns">🔫 بنادق</button>
+    <button class="tab-btn" data-tab="extras">✨ إضافات</button>
+  </div>
+  <div id="shop-balls" class="shop-section active">
+    <div class="shop-item"><div><div class="shop-item-title">🎁 200 كرة مجانية كل 12 ساعة</div><div class="shop-item-desc"><span id="free-timer">جاهز</span></div></div><button class="shop-buy-btn" id="claim-free">استلام</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🟣 100 كرة عادية</div><div class="shop-item-price">🪙 100</div></div><button class="shop-buy-btn" data-buy="normal_100">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🟣 250 كرة عادية - عرض</div><div class="shop-item-price">🪙 220</div></div><button class="shop-buy-btn" data-buy="normal_250">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🧊 جليدية x20</div><div class="shop-item-desc">تنقسم لكرتين - تكسير متسلسل</div><div class="shop-item-price">🪙 250</div></div><button class="shop-buy-btn" data-buy="ice_20">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🧊 جليدية x50 - حزمة</div><div class="shop-item-price">🪙 550</div></div><button class="shop-buy-btn" data-buy="ice_50">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🔥 نارية x20</div><div class="shop-item-price">🪙 300</div></div><button class="shop-buy-btn" data-buy="fire_20">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🔥 نارية x50</div><div class="shop-item-price">🪙 650</div></div><button class="shop-buy-btn" data-buy="fire_50">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">⚙️ حديدية x15 - ثقيلة جدا 10.5px</div><div class="shop-item-desc">صلابة عالية + تخترق الجليد</div><div class="shop-item-price">🪙 350</div></div><button class="shop-buy-btn" data-buy="iron_15">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">⚙️ حديدية x40 - حزمة ثقيلة</div><div class="shop-item-price">🪙 800</div></div><button class="shop-buy-btn" data-buy="iron_40">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🎁 حزمة متنوعة 30 من كل نوع</div><div class="shop-item-price">🪙 900</div></div><button class="shop-buy-btn" data-buy="mix_30">شراء</button></div>
+  </div>
+  <div id="shop-cards" class="shop-section">
+    <div class="shop-item"><div><div class="shop-item-title">🃏 Double - ضاعف كأس</div><div class="shop-item-price">🪙 200</div></div><button class="shop-buy-btn" data-buy="card_double">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🃏 Merge - ادمج كأسين</div><div class="shop-item-price">🪙 300</div></div><button class="shop-buy-btn" data-buy="card_merge">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🃏 Redo - إعادة</div><div class="shop-item-price">🪙 150</div></div><button class="shop-buy-btn" data-buy="card_redo">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🃏 Extra +20 كرة</div><div class="shop-item-price">🪙 180</div></div><button class="shop-buy-btn" data-buy="card_extra">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🃏 حزمة بطاقات 2 من كل نوع</div><div class="shop-item-price">🪙 600</div></div><button class="shop-buy-btn" data-buy="cards_pack">شراء</button></div>
+  </div>
+  <div id="shop-coins" class="shop-section">
+    <div style="background:linear-gradient(90deg,#ff6b9d,#f1c40f);padding:10px;border-radius:10px;margin-bottom:10px;border:2px solid #fff;text-align:center">
+      <div style="font-size:12px;color:#000;font-weight:bold">💵 6 باقات دولار - IAP حقيقية - تظهر الآن!</div>
+      <div style="font-size:8px;color:#000">مستنسخة من Pokémon GO و Candy Crush - الأكثر شعبية $4.99</div>
+    </div>
+    <div class="shop-item" style="border:2px solid #3498db;background:rgba(52,152,219,0.15)"><div><div class="shop-item-title">💰 $0.99 → 500🪙 - البداية</div><div class="shop-item-desc">500 كوين - بدون بونص</div><div class="shop-item-price">$0.99</div></div><button class="shop-buy-btn" data-buy="usd_099" style="background:#3498db">$0.99</button></div>
+    <div class="shop-item" style="border:3px solid #ffd700;background:linear-gradient(90deg,rgba(255,215,0,0.15),rgba(255,235,59,0.25))"><div><div class="shop-item-title">⭐ $4.99 → 3000🪙+20🧊 (19% بونص)</div><div class="shop-item-desc">🔥 الأكثر شعبية - 70% يشترونها</div><div class="shop-item-price">$4.99 - قيمة 3590</div></div><button class="shop-buy-btn" data-buy="usd_499" style="background:linear-gradient(180deg,#f1c40f,#f39c12);color:#000;font-weight:bold">⭐ $4.99</button></div>
+    <div class="shop-item" style="border:2px solid #2ecc71;background:rgba(46,204,113,0.15)"><div><div class="shop-item-title">💎 $9.99 → 6500🪙+50🧊+20🔩 (30%)</div><div class="shop-item-desc">باقة القيمة</div><div class="shop-item-price">$9.99</div></div><button class="shop-buy-btn" data-buy="usd_999" style="background:#2ecc71">$9.99</button></div>
+    <div class="shop-item" style="border:2px solid #9b59b6"><div><div class="shop-item-title">🚀 $19.99 → 14000🪙+100🔩+توقع إضافي (40%)</div><div class="shop-item-desc">المحترفين</div><div class="shop-item-price">$19.99</div></div><button class="shop-buy-btn" data-buy="usd_1999" style="background:#9b59b6">$19.99</button></div>
+    <div class="shop-item" style="border:2px solid #e74c3c"><div><div class="shop-item-title">🏆 $49.99 → 38000🪙+200🎱+10🔫+مضاعف ساعة (50%)</div><div class="shop-item-desc">الحوت</div><div class="shop-item-price">$49.99</div></div><button class="shop-buy-btn" data-buy="usd_4999" style="background:#e74c3c">$49.99</button></div>
+    <div class="shop-item" style="border:3px solid #ff6b9d;background:linear-gradient(90deg,rgba(255,107,157,0.15),rgba(155,89,182,0.25))"><div><div class="shop-item-title">👑 $99.99 → 80000🪙+500🎱+20🔫+كل شيء (60%)</div><div class="shop-item-desc">الأسطورة - كل شيء</div><div class="shop-item-price">$99.99</div></div><button class="shop-buy-btn" data-buy="usd_9999" style="background:linear-gradient(180deg,#ff6b9d,#9b59b6)">$99.99</button></div>
+    <div style="height:2px;background:#ffd700;margin:12px 0"></div>
+    <div style="font-size:9px;color:#7dd8ff;font-weight:bold;margin-bottom:6px">⭐ باقات النجوم</div>
+    <div class="shop-item"><div><div class="shop-item-title">🪙 500 كوين</div><div class="shop-item-price">⭐ 100</div></div><button class="shop-buy-btn" data-buy="coins_500">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🪙 1500 كوين</div><div class="shop-item-price">⭐ 250</div></div><button class="shop-buy-btn" data-buy="coins_1500">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🪙 5000 كوين</div><div class="shop-item-price">⭐ 600</div></div><button class="shop-buy-btn" data-buy="coins_5000">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">💎 10000 + 100 كرة</div><div class="shop-item-price">⭐ 1000</div></div><button class="shop-buy-btn" data-buy="coins_10000">شراء</button></div>
+  </div>
+  <div id="shop-guns" class="shop-section">
+    <div class="shop-item"><div><div class="shop-item-title">🔫 بندقية عادية - 5 كرات سريعة</div><div class="shop-item-price">🪙 180</div></div><button class="shop-buy-btn" data-buy="gun_normal">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🔥 بندقية نارية - تذيب فوري</div><div class="shop-item-price">🪙 280</div></div><button class="shop-buy-btn" data-buy="gun_fire">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🧊 بندقية جليدية - 5 جليديات سريعة تنقسم</div><div class="shop-item-price">🪙 320</div></div><button class="shop-buy-btn" data-buy="gun_ice">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🎲 لوحة جديدة عشوائية</div><div class="shop-item-price">🪙 100</div></div><button class="shop-buy-btn" data-buy="board_random">تغيير</button></div>
+  </div>
+  <div id="shop-extras" class="shop-section">
+    <div class="shop-item"><div><div class="shop-item-title">🔮 توقع إضافي - مرة ثانية اليوم</div><div class="shop-item-desc">يسمح بتوقع ثاني إذا أخطأت الأول</div><div class="shop-item-price">🪙 150</div></div><button class="shop-buy-btn" data-buy="extra_predict">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">⭐ مضاعف نجوم - 2X لمدة ساعة</div><div class="shop-item-desc">كل فوز مضاعف لمدة 60 دقيقة</div><div class="shop-item-price">🪙 400</div></div><button class="shop-buy-btn" data-buy="star_booster">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🧲 مغناطيس - يقلل احتياج الأوعية 10</div><div class="shop-item-desc">A,E تصبح 50 بدلا من 60</div><div class="shop-item-price">🪙 500</div></div><button class="shop-buy-btn" data-buy="magnet">شراء</button></div>
+    <div class="shop-item"><div><div class="shop-item-title">🎵 فتح موسيقى خلفية حصرية</div><div class="shop-item-desc">لحن جليدي هادئ</div><div class="shop-item-price">🪙 200</div></div><button class="shop-buy-btn" data-buy="music_pack">شراء</button></div>
+  </div>
+</div>
+
+<div id="card-modal">
+  <div class="modal-box">
+    <h3 id="card-modal-title" style="font-size:14px;margin-bottom:8px;text-align:center">اختر كأس</h3>
+    <div id="card-modal-desc" style="font-size:9px;color:#aaa;text-align:center"></div>
+    <div class="bucket-select" id="bucket-select"></div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+      <button id="card-confirm" style="padding:8px 18px;background:#2ecc71;border:none;border-radius:8px;color:white;font-weight:bold;cursor:pointer">تأكيد</button>
+      <button id="card-cancel" style="padding:8px 18px;background:#555;border:none;border-radius:8px;color:white;cursor:pointer">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div id="predict-modal">
+  <div class="modal-box" style="border-color:#ffeb3b">
+    <div style="font-size:24px">🔮 توقع يومي</div>
+    <div style="font-size:10px;color:#aaa;margin:8px 0">توقع أي كأس سيمتلئ أولا - مرة واحدة في اليوم<br>إذا صح توقعك، النجوم ×2</div>
+    <div style="font-size:8px;color:#ffd700;margin-bottom:8px">C وسط 40 كرة→70⭐ | B,D 50→65⭐ | A,E 60→60⭐</div>
+    <div class="bucket-select" id="predict-select"></div>
+    <div id="predict-info" style="font-size:9px;color:#7dd8ff;margin:8px 0"></div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+      <button id="predict-confirm" style="padding:8px 18px;background:#ffeb3b;border:none;border-radius:8px;color:#000;font-weight:bold;cursor:pointer">تأكيد التوقع</button>
+      <button id="predict-cancel" style="padding:8px 18px;background:#555;border:none;border-radius:8px;color:white;cursor:pointer">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div id="win-modal" style="display:none;flex-direction:column">
+  <div class="modal-box">
+    <div style="font-size:32px">🎉</div>
+    <div id="win-text" style="font-size:14px;font-weight:bold;margin:8px 0"></div>
+    <div id="win-stars" style="font-size:10px;color:#ffd700"></div>
+    <div id="win-predict-bonus" style="font-size:11px;color:#ffeb3b;margin-top:6px;display:none"></div>
+    <button id="next-level" style="margin-top:14px;padding:10px 24px;background:linear-gradient(180deg,#2ecc71,#27ae60);border:none;border-radius:10px;color:white;font-weight:bold;cursor:pointer">التالي ▶</button>
+  </div>
+</div>
+
+<div id="gift-box" style="display:none;flex-direction:column">
+  <div class="modal-box" style="border-color:#ffd700">
+    <div style="font-size:28px">🎁</div>
+    <div id="gift-content" style="margin:12px 0;font-size:12px"></div>
+    <button id="open-gift" style="padding:8px 18px;background:#f39c12;border:none;border-radius:8px;color:white;cursor:pointer;font-weight:bold">فتح</button>
+  </div>
+</div>
+
+<div id="user-stats-modal">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:linear-gradient(90deg,#1a1f4b,#2d3561);border-radius:10px;margin-bottom:10px;border:1px solid #7dd8ff">
+    <div>📊 إحصائياتي - v5.7 Ultimate - ^ أقرب</div>
+    <button id="close-stats" style="background:#e74c3c;border:none;padding:4px 9px;border-radius:6px;color:white;cursor:pointer">X</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <div style="background:rgba(255,255,255,0.05);border:1px solid #3a4a7a;border-radius:8px;padding:10px">
+      <div style="font-size:10px;color:#7dd8ff;font-weight:bold;margin-bottom:6px">🎱 الكرات</div>
+      <div style="font-size:9px;line-height:1.6" id="st-balls-detail"></div>
+    </div>
+    <div style="background:rgba(255,255,255,0.05);border:1px solid #3a4a7a;border-radius:8px;padding:10px">
+      <div style="font-size:10px;color:#ffd700;font-weight:bold;margin-bottom:6px">🪙 الاقتصاد والنقاط</div>
+      <div style="font-size:9px;line-height:1.6" id="st-econ-detail"></div>
+    </div>
+    <div style="background:rgba(255,255,255,0.05);border:1px solid #3a4a7a;border-radius:8px;padding:10px">
+      <div style="font-size:10px;color:#ff9ecd;font-weight:bold;margin-bottom:6px">🃏 البطاقات</div>
+      <div style="font-size:9px;line-height:1.6" id="st-cards-detail"></div>
+    </div>
+    <div style="background:rgba(255,255,255,0.05);border:1px solid #3a4a7a;border-radius:8px;padding:10px">
+      <div style="font-size:10px;color:#2ecc71;font-weight:bold;margin-bottom:6px">🏆 الأوعية والتوقع</div>
+      <div style="font-size:9px;line-height:1.6" id="st-buckets-detail"></div>
+    </div>
+  </div>
+</div>
+
+<div id="card-used"></div>
+</div>
+
+<script src="js/ui.js"></script>
+<script src="js/effects.js"></script>
+<script src="js/iap.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

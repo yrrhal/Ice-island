@@ -1,0 +1,21 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Android (يُنشأ تلقائيًا بأمر: npx cap add android)
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/*.iml
+android/.idea/
+android/captures/
+
+# مفاتيح التوقيع — لا تُرفع أبدًا لأي مستودع، حتى خاص
+*.keystore
+*.jks
+key.properties
+
+# ملفات النظام
+.DS_Store
+Thumbs.db

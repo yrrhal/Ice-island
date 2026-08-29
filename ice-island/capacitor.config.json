@@ -1,0 +1,9 @@
+{
+  "appId": "com.sympraxis.iceisland",
+  "appName": "جزيرة الجليد",
+  "webDir": "www",
+  "backgroundColor": "#0b1230",
+  "android": {
+    "allowMixedContent": false
+  }
+}
