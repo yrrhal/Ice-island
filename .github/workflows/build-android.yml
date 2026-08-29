@@ -24,12 +24,10 @@ jobs:
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Build Web Assets & Sync Capacitor
+      - name: Build Web & Sync Capacitor
         run: |
           npm run build --if-present
-          if [ -d "android" ]; then
-            npx cap sync android || true
-          fi
+          npx cap sync android
 
       - name: Set up Java JDK
         uses: actions/setup-java@v4
@@ -39,9 +37,7 @@ jobs:
 
       - name: Build Android APK
         run: |
-          if [ -d "android" ]; then
-            cd android
-          fi
+          cd android
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace
 
@@ -49,4 +45,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
-          path: '**/build/outputs/apk/debug/*.apk'
+          path: android/app/build/outputs/apk/debug/app-debug.apk

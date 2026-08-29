@@ -9,10 +9,10 @@
     "add:android": "cap add android"
   },
   "dependencies": {
-    "@capacitor/android": "^6.1.2",
-    "@capacitor/core": "^6.1.2"
+    "@capacitor/android": "^6.2.1",
+    "@capacitor/core": "^6.2.1"
   },
   "devDependencies": {
-    "@capacitor/cli": "^6.1.2"
+    "@capacitor/cli": "^6.2.1"
   }
 }
